@@ -11,6 +11,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isTurnO = true;
   List<String> xOrOList = ['', '', '', '', '', '', '', '', ''];
   int filledBoxes = 0;
+  bool gameHasResult = false;
+  int scoreX = 0;
+  int scoreO = 0;
+  String winnerTitle = '';
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              clearGame();
+            },
             icon: Icon(Icons.refresh, color: Colors.white),
           ),
         ],
@@ -40,10 +46,38 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             SizedBox(height: 20),
             getScoreBoard(),
-            SizedBox(height: 40),
+            SizedBox(height: 20),
+            getResultButton(),
+            SizedBox(height: 20),
             getGridView(),
             getTurn(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget getResultButton() {
+    return Visibility(
+      visible: gameHasResult,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: BorderSide(color: Colors.white, width: 2),
+        ),
+        onPressed: () {
+          setState(() {
+            gameHasResult = false;
+            clearGameBoard();
+          });
+        },
+        child: Text(
+          '$winnerTitle, play again!',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -94,7 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void tapped(int index) {
-    print('$index');
+    if (gameHasResult) {
+      return;
+    }
     setState(() {
       if (xOrOList[index] != '') {
         return;
@@ -115,53 +151,53 @@ class _HomeScreenState extends State<HomeScreen> {
     if (xOrOList[0] == xOrOList[1] &&
         xOrOList[0] == xOrOList[2] &&
         xOrOList[0] != '') {
-      print('Winner is ' + xOrOList[0]);
+      setResult(xOrOList[0], 'winner is ' + xOrOList[0]);
       return;
     }
     if (xOrOList[3] == xOrOList[4] &&
         xOrOList[3] == xOrOList[5] &&
         xOrOList[3] != '') {
-      print('Winner is ' + xOrOList[3]);
+      setResult(xOrOList[3], 'winner is ' + xOrOList[3]);
       return;
     }
     if (xOrOList[6] == xOrOList[7] &&
         xOrOList[6] == xOrOList[8] &&
         xOrOList[6] != '') {
-      print('Winner is ' + xOrOList[6]);
+      setResult(xOrOList[6], 'winner is ' + xOrOList[6]);
       return;
     }
     if (xOrOList[0] == xOrOList[3] &&
         xOrOList[0] == xOrOList[6] &&
         xOrOList[0] != '') {
-      print('Winner is ' + xOrOList[0]);
+      setResult(xOrOList[0], 'winner is ' + xOrOList[0]);
       return;
     }
     if (xOrOList[1] == xOrOList[4] &&
         xOrOList[1] == xOrOList[7] &&
         xOrOList[1] != '') {
-      print('Winner is ' + xOrOList[1]);
+      setResult(xOrOList[1], 'winner is ' + xOrOList[1]);
       return;
     }
     if (xOrOList[2] == xOrOList[5] &&
         xOrOList[2] == xOrOList[8] &&
         xOrOList[2] != '') {
-      print('Winner is ' + xOrOList[2]);
+      setResult(xOrOList[2], 'winner is ' + xOrOList[2]);
       return;
     }
     if (xOrOList[0] == xOrOList[4] &&
         xOrOList[0] == xOrOList[8] &&
         xOrOList[0] != '') {
-      print('Winner is ' + xOrOList[0]);
+      setResult(xOrOList[0], 'winner is ' + xOrOList[0]);
       return;
     }
     if (xOrOList[2] == xOrOList[4] &&
         xOrOList[2] == xOrOList[6] &&
         xOrOList[2] != '') {
-      print('Winner is ' + xOrOList[2]);
+      setResult(xOrOList[2], 'winner is ' + xOrOList[2]);
       return;
     }
     if (filledBoxes == 9) {
-      print('game is equal');
+      setResult('', 'Draw');
     }
   }
 
@@ -181,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  '0',
+                  '$scoreO',
                   style: TextStyle(color: Colors.white, fontSize: 25),
                 ),
               ),
@@ -201,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  '1',
+                  '$scoreX',
                   style: TextStyle(color: Colors.white, fontSize: 25),
                 ),
               ),
@@ -213,6 +249,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void clearGame() {
-    setState(() {});
+    setState(() {
+      for (int i = 0; i < xOrOList.length; i++) {
+        xOrOList[i] = '';
+      }
+      filledBoxes = 0;
+      gameHasResult = false;
+      winnerTitle = '';
+      scoreX = 0;
+      scoreO = 0;
+      isTurnO = true;
+    });
+  }
+
+  void clearGameBoard() {
+    setState(() {
+      for (int i = 0; i < xOrOList.length; i++) {
+        xOrOList[i] = '';
+      }
+    });
+    filledBoxes = 0;
+  }
+
+  void setResult(String winner, String title) {
+    setState(() {
+      gameHasResult = true;
+      winnerTitle = title;
+      if (winner == 'X') {
+        scoreX = scoreX + 1;
+      } else if (winner == 'O') {
+        scoreO = scoreO + 1;
+      } else {
+        scoreX = scoreX + 1;
+        scoreO = scoreO + 1;
+      }
+    });
   }
 }
